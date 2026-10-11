@@ -7,18 +7,18 @@
 #include <condition_variable>
 #include "../cairo/CairoSurface.hpp"
 #include "./resources/AsyncResource.hpp"
-#include <hyprutils/memory/Atomic.hpp>
+#include <abyssutils/memory/Atomic.hpp>
 
-namespace Hyprgraphics {
+namespace Abyssgraphics {
     class CAsyncResourceGatherer {
       public:
         CAsyncResourceGatherer();
         ~CAsyncResourceGatherer();
 
-        void enqueue(Hyprutils::Memory::CAtomicSharedPointer<IAsyncResource> resource);
+        void enqueue(Abyssutils::Memory::CAtomicSharedPointer<IAsyncResource> resource);
 
         // Synchronously await the resource being available
-        void await(Hyprutils::Memory::CAtomicSharedPointer<IAsyncResource> resource);
+        void await(Abyssutils::Memory::CAtomicSharedPointer<IAsyncResource> resource);
 
       private:
         std::thread m_gatherThread;
@@ -31,7 +31,7 @@ namespace Hyprgraphics {
             bool                    needsToProcess = false;
         } m_asyncLoopState;
 
-        std::vector<Hyprutils::Memory::CAtomicSharedPointer<IAsyncResource>> m_targetsToLoad;
+        std::vector<Abyssutils::Memory::CAtomicSharedPointer<IAsyncResource>> m_targetsToLoad;
         std::mutex                                                           m_targetsToLoadMutex;
 
         //

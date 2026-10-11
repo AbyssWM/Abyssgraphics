@@ -1,10 +1,10 @@
-#include <hyprgraphics/resource/resources/AsyncResource.hpp>
+#include <abyssgraphics/resource/resources/AsyncResource.hpp>
 
 #include <condition_variable>
 
-namespace Hyprgraphics {
+namespace Abyssgraphics {
     struct SAsyncResourceImpl {
-        Hyprutils::Memory::CUniquePointer<std::condition_variable> awaitingCv;
+        Abyssutils::Memory::CUniquePointer<std::condition_variable> awaitingCv;
         std::mutex                                                 awaitingMtx;
         bool                                                       awaitingEvent = false;
     };

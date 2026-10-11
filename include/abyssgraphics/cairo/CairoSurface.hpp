@@ -2,9 +2,9 @@
 
 #include <cstdint>
 #include <cairo/cairo.h>
-#include <hyprutils/math/Vector2D.hpp>
+#include <abyssutils/math/Vector2D.hpp>
 
-namespace Hyprgraphics {
+namespace Abyssgraphics {
 
     // A simple cairo surface wrapper. Will destroy the surface in the ~dtor.
     class CCairoSurface {
@@ -18,7 +18,7 @@ namespace Hyprgraphics {
         CCairoSurface&            operator=(CCairoSurface&&)      = delete;
 
         cairo_surface_t*          cairo();
-        Hyprutils::Math::Vector2D size();
+        Abyssutils::Math::Vector2D size();
         int                       status();
         uint8_t*                  data();
         int                       stride();

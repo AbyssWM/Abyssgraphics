@@ -7,9 +7,9 @@
 
 #include <optional>
 
-#include <hyprutils/math/Vector2D.hpp>
+#include <abyssutils/math/Vector2D.hpp>
 
-namespace Hyprgraphics {
+namespace Abyssgraphics {
     class CTextResource : public IAsyncResource {
       public:
         enum eTextAlignmentMode : uint8_t {
@@ -24,7 +24,7 @@ namespace Hyprgraphics {
             size_t                                   fontSize  = 16;
             CColor                                   color     = CColor{CColor::SSRGB{.r = 1.F, .g = 1.F, .b = 1.F}};
             eTextAlignmentMode                       align     = TEXT_ALIGN_LEFT;
-            std::optional<Hyprutils::Math::Vector2D> maxSize   = std::nullopt;
+            std::optional<Abyssutils::Math::Vector2D> maxSize   = std::nullopt;
             cairo_antialias_t                        antialias = CAIRO_ANTIALIAS_GOOD;
             cairo_hint_style_t                       hintStyle = CAIRO_HINT_STYLE_SLIGHT;
             bool                                     ellipsize = false;

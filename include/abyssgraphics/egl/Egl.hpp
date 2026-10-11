@@ -4,9 +4,9 @@
 #include <cstdint>
 #include <GLES3/gl32.h>
 #include <optional>
-#include <hyprutils/math/Vector2D.hpp>
+#include <abyssutils/math/Vector2D.hpp>
 
-namespace Hyprgraphics::Egl {
+namespace Abyssgraphics::Egl {
     inline constexpr std::array<GLint, 4> SWIZZLE_A1GB{GL_ALPHA, GL_ONE, GL_GREEN, GL_BLUE};
     inline constexpr std::array<GLint, 4> SWIZZLE_ABG1{GL_ALPHA, GL_BLUE, GL_GREEN, GL_ONE};
     inline constexpr std::array<GLint, 4> SWIZZLE_ABGR{GL_ALPHA, GL_BLUE, GL_GREEN, GL_RED};
@@ -35,7 +35,7 @@ namespace Hyprgraphics::Egl {
         bool                                withAlpha        = true;
         uint32_t                            alphaStripped    = 0; /* DRM_FORMAT_INVALID */
         uint32_t                            bytesPerBlock    = 0;
-        Hyprutils::Math::Vector2D           blockSize;
+        Abyssutils::Math::Vector2D           blockSize;
         std::optional<std::array<GLint, 4>> swizzle = std::nullopt;
     };
 

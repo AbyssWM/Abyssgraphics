@@ -1,0 +1,10 @@
+prefix=@PREFIX@
+includedir=@INCLUDE@
+libdir=@LIBDIR@
+
+Name: abyssgraphics
+URL: https://github.com/AbyssWM/abyssgraphics
+Description: Abyssland graphics utilities library used across the ecosystem 
+Version: @ABYSSGRAPHICS_VERSION@
+Cflags: -I${includedir}
+Libs: -L${libdir} -labyssgraphics

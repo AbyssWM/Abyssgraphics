@@ -1,7 +1,7 @@
-#include <hyprgraphics/resource/AsyncResourceGatherer.hpp>
+#include <abyssgraphics/resource/AsyncResourceGatherer.hpp>
 #include "resources/AsyncResource.hpp"
 
-using namespace Hyprgraphics;
+using namespace Abyssgraphics;
 
 CAsyncResourceGatherer::CAsyncResourceGatherer() {
     m_gatherThread = std::thread([this]() { asyncAssetSpinLock(); });
@@ -20,7 +20,7 @@ void CAsyncResourceGatherer::wakeUpMainThread() {
     m_asyncLoopState.requestsCV.notify_all();
 }
 
-void CAsyncResourceGatherer::enqueue(Hyprutils::Memory::CAtomicSharedPointer<IAsyncResource> resource) {
+void CAsyncResourceGatherer::enqueue(Abyssutils::Memory::CAtomicSharedPointer<IAsyncResource> resource) {
     {
         std::lock_guard<std::mutex> lg(m_targetsToLoadMutex);
         m_targetsToLoad.emplace_back(resource);
@@ -29,8 +29,8 @@ void CAsyncResourceGatherer::enqueue(Hyprutils::Memory::CAtomicSharedPointer<IAs
     wakeUpMainThread();
 }
 
-void CAsyncResourceGatherer::await(Hyprutils::Memory::CAtomicSharedPointer<IAsyncResource> resource) {
-    resource->m_impl->awaitingCv = Hyprutils::Memory::makeUnique<std::condition_variable>();
+void CAsyncResourceGatherer::await(Abyssutils::Memory::CAtomicSharedPointer<IAsyncResource> resource) {
+    resource->m_impl->awaitingCv = Abyssutils::Memory::makeUnique<std::condition_variable>();
     std::unique_lock<std::mutex> lk(resource->m_impl->awaitingMtx);
     resource->m_impl->awaitingCv->wait(lk, [&resource] { return resource->m_impl->awaitingEvent; });
     resource->m_impl->awaitingCv.reset();

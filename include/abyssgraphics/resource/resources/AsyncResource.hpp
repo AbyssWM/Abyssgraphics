@@ -1,12 +1,12 @@
 #pragma once
 
-#include <hyprutils/memory/UniquePtr.hpp>
-#include <hyprutils/math/Vector2D.hpp>
-#include <hyprutils/signal/Signal.hpp>
+#include <abyssutils/memory/UniquePtr.hpp>
+#include <abyssutils/math/Vector2D.hpp>
+#include <abyssutils/signal/Signal.hpp>
 #include "../../cairo/CairoSurface.hpp"
 #include <atomic>
 
-namespace Hyprgraphics {
+namespace Abyssgraphics {
     struct SAsyncResourceImpl;
 
     class IAsyncResource {
@@ -19,7 +19,7 @@ namespace Hyprgraphics {
         struct {
             // this signal fires on the worker thread. **Really** consider making this signal handler call something to wake your
             // main event loop up and do things there.
-            Hyprutils::Signal::CSignalT<> finished;
+            Abyssutils::Signal::CSignalT<> finished;
         } m_events;
 
         // you probably shouldn't use this but it's here just in case.
@@ -28,10 +28,10 @@ namespace Hyprgraphics {
         struct {
             // This pointer can be made not thread safe as after .finished the worker thread will not touch it anymore
             // and before that you shouldnt touch it either
-            Hyprutils::Memory::CSharedPointer<CCairoSurface> cairoSurface;
-            Hyprutils::Math::Vector2D                        pixelSize;
+            Abyssutils::Memory::CSharedPointer<CCairoSurface> cairoSurface;
+            Abyssutils::Math::Vector2D                        pixelSize;
         } m_asset;
 
-        Hyprutils::Memory::CUniquePointer<SAsyncResourceImpl> m_impl;
+        Abyssutils::Memory::CUniquePointer<SAsyncResourceImpl> m_impl;
     };
 }

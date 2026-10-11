@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.19)
 
 file(READ "${CMAKE_SOURCE_DIR}/VERSION" VER_RAW)
-string(STRIP ${VER_RAW} HYPRGRAPHICS_VERSION)
-add_compile_definitions(HYPRGRAPHICS_VERSION="${HYPRGRAPHICS_VERSION}")
+string(STRIP ${VER_RAW} ABYSSGRAPHICS_VERSION)
+add_compile_definitions(ABYSSGRAPHICS_VERSION="${ABYSSGRAPHICS_VERSION}")
 
 project(
-  hyprgraphics
-  VERSION ${HYPRGRAPHICS_VERSION}
+  abyssgraphics
+  VERSION ${ABYSSGRAPHICS_VERSION}
   DESCRIPTION
-    "Small C++ library for graphics / resource utilities used across the Hypr* ecosystem"
+    "Small C++ library for graphics / resource utilities used across the Abyss* ecosystem"
 )
 
 include(CTest)
@@ -18,7 +18,7 @@ set(PREFIX ${CMAKE_INSTALL_PREFIX})
 set(INCLUDE ${CMAKE_INSTALL_FULL_INCLUDEDIR})
 set(LIBDIR ${CMAKE_INSTALL_FULL_LIBDIR})
 
-configure_file(hyprgraphics.pc.in hyprgraphics.pc @ONLY)
+configure_file(abyssgraphics.pc.in abyssgraphics.pc @ONLY)
 
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
@@ -33,11 +33,11 @@ add_compile_options(
   -Wno-missing-braces)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES DEBUG)
-  message(STATUS "Configuring hyprgraphics in Debug")
-  add_compile_definitions(HYPRGRAPHICS_DEBUG)
+  message(STATUS "Configuring abyssgraphics in Debug")
+  add_compile_definitions(ABYSSGRAPHICS_DEBUG)
 else()
   add_compile_options(-O3)
-  message(STATUS "Configuring hyprgraphics in Release")
+  message(STATUS "Configuring abyssgraphics in Release")
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -59,7 +59,7 @@ pkg_check_modules(
   pixman-1
   cairo
   pangocairo
-  hyprutils
+  abyssutils
   libjpeg
   libwebp
   libmagic
@@ -93,43 +93,43 @@ else()
   add_compile_definitions(HEIF_FOUND)
 endif()
 
-add_library(hyprgraphics SHARED ${SRCFILES})
+add_library(abyssgraphics SHARED ${SRCFILES})
 target_include_directories(
-  hyprgraphics
+  abyssgraphics
   PUBLIC "./include"
   PRIVATE "./src")
-set_target_properties(hyprgraphics PROPERTIES VERSION ${HYPRGRAPHICS_VERSION}
+set_target_properties(abyssgraphics PROPERTIES VERSION ${ABYSSGRAPHICS_VERSION}
                                               SOVERSION 4)
-target_link_libraries(hyprgraphics PkgConfig::deps)
+target_link_libraries(abyssgraphics PkgConfig::deps)
 if(JXL_FOUND)
-  target_link_libraries(hyprgraphics PkgConfig::JXL)
+  target_link_libraries(abyssgraphics PkgConfig::JXL)
 endif()
 
 if(HEIF_FOUND)
-  target_link_libraries(hyprgraphics PkgConfig::HEIF)
+  target_link_libraries(abyssgraphics PkgConfig::HEIF)
 endif()
 
 # tests
 add_custom_target(tests)
 
-add_executable(hyprgraphics_image "tests/image.cpp")
-target_link_libraries(hyprgraphics_image PRIVATE hyprgraphics PkgConfig::deps)
+add_executable(abyssgraphics_image "tests/image.cpp")
+target_link_libraries(abyssgraphics_image PRIVATE abyssgraphics PkgConfig::deps)
 add_test(
   NAME "Image"
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests
-  COMMAND hyprgraphics_image "image")
-add_dependencies(tests hyprgraphics_image)
-add_executable(hyprgraphics_arg "tests/arg.cpp")
-target_link_libraries(hyprgraphics_arg PRIVATE hyprgraphics PkgConfig::deps)
+  COMMAND abyssgraphics_image "image")
+add_dependencies(tests abyssgraphics_image)
+add_executable(abyssgraphics_arg "tests/arg.cpp")
+target_link_libraries(abyssgraphics_arg PRIVATE abyssgraphics PkgConfig::deps)
 add_test(
   NAME "ARG"
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests
-  COMMAND hyprgraphics_arg "image")
-add_dependencies(tests hyprgraphics_arg)
+  COMMAND abyssgraphics_arg "image")
+add_dependencies(tests abyssgraphics_arg)
 
 # Installation
-install(TARGETS hyprgraphics)
-install(DIRECTORY "include/hyprgraphics"
+install(TARGETS abyssgraphics)
+install(DIRECTORY "include/abyssgraphics"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(FILES ${CMAKE_BINARY_DIR}/hyprgraphics.pc
+install(FILES ${CMAKE_BINARY_DIR}/abyssgraphics.pc
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)

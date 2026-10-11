@@ -1,14 +1,14 @@
 #include <cmath>
-#include <hyprgraphics/egl/Egl.hpp>
-#include <hyprutils/memory/Casts.hpp>
+#include <abyssgraphics/egl/Egl.hpp>
+#include <abyssutils/memory/Casts.hpp>
 #include <vector>
 #include <GLES3/gl32.h>
 #include <xf86drm.h>
 #include <drm_fourcc.h>
 
-using namespace Hyprutils::Memory;
+using namespace Abyssutils::Memory;
 
-namespace Hyprgraphics::Egl {
+namespace Abyssgraphics::Egl {
     static inline const std::vector<SPixelFormat> GLES3_FORMATS = {
         {
             .drmFormat        = DRM_FORMAT_ARGB8888,

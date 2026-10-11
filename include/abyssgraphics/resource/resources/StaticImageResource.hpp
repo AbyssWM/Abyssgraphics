@@ -2,14 +2,14 @@
 
 #include "./AsyncResource.hpp"
 #include "../../color/Color.hpp"
-#include "hyprgraphics/image/Image.hpp"
+#include "abyssgraphics/image/Image.hpp"
 
 #include <optional>
 #include <span>
 
-#include <hyprutils/math/Vector2D.hpp>
+#include <abyssutils/math/Vector2D.hpp>
 
-namespace Hyprgraphics {
+namespace Abyssgraphics {
     class CStaticImageResource : public IAsyncResource {
       public:
         enum eTextAlignmentMode : uint8_t {

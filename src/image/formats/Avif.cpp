@@ -4,10 +4,10 @@
 #include <cstring>
 #include <expected>
 #include <filesystem>
-#include <hyprutils/utils/ScopeGuard.hpp>
+#include <abyssutils/utils/ScopeGuard.hpp>
 #include <libheif/heif.h>
 #include <vector>
-using namespace Hyprutils::Utils;
+using namespace Abyssutils::Utils;
 
 static std::expected<cairo_surface_t*, std::string> loadFromContext(heif_context* ctx) {
     heif_image_handle* handle;

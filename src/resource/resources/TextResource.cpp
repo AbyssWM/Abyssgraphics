@@ -1,12 +1,12 @@
-#include <hyprgraphics/resource/resources/TextResource.hpp>
-#include <hyprutils/memory/Atomic.hpp>
-#include <hyprutils/memory/Casts.hpp>
+#include <abyssgraphics/resource/resources/TextResource.hpp>
+#include <abyssutils/memory/Atomic.hpp>
+#include <abyssutils/memory/Casts.hpp>
 
 #include <cairo/cairo.h>
 #include <pango/pangocairo.h>
 
-using namespace Hyprgraphics;
-using namespace Hyprutils::Memory;
+using namespace Abyssgraphics;
+using namespace Abyssutils::Memory;
 
 CTextResource::CTextResource(CTextResource::STextResourceData&& data) : m_data(std::move(data)) {
     ;

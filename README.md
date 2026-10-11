@@ -1,34 +1,52 @@
-# hyprgraphics
+<div align="center">
 
-Hyprgraphics is a small C++ library with graphics / resource related utilities used across the hypr* ecosystem.
+<img src="https://github.com/AbyssWM.png?size=200" width="160" alt="Abyss logo">
 
-## Stability
+# Abyssgraphics
 
-Hyprgraphics depends on the ABI stability of the stdlib implementation of your compiler. Sover bumps will be done only for hyprgraphics ABI breaks, not stdlib.
+**Graphics and image resource library for the Abyss ecosystem.**
 
-## Dependencies
+Part of [**Abyss**](https://github.com/AbyssWM) · Based on [hyprgraphics](https://github.com/hyprwm/hyprgraphics) by [hyprwm](https://github.com/hyprwm)
 
-Requires a compiler with C++26 support.
+</div>
 
-Dep list:
- - pixman-1
- - cairo
- - hyprutils
- - libjpeg
- - libwebp
- - libjxl [optional]
- - libjxl_cms [optional]
- - libjxl_threads [optional]
- - libmagic
- - libpng
- - librsvg2
+---
 
-## Building
+> [!WARNING]
+> **Early development.** Abyss is being rebranded and reworked right now. Nothing is ready for daily use yet.
 
-```sh
-git clone https://github.com/hyprwm/hyprgraphics
-cd hyprgraphics/
-cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr -S . -B ./build
-cmake --build ./build --config Release --target all -j`nproc 2>/dev/null || getconf NPROCESSORS_CONF`
-sudo cmake --install build
-```
+## About
+
+Abyssgraphics handles image loading (PNG, JPEG, WebP, SVG, JXL, ...) and color utilities for Abyss projects.
+
+Abyssgraphics is a fork of [hyprgraphics](https://github.com/hyprwm/hyprgraphics). Every Abyss library and tool is forked and renamed, so the whole ecosystem builds and updates as one – independent of system packages.
+
+## The Abyss ecosystem
+
+| Repository | Based on |
+|---|---|
+| [Abyssland](https://github.com/AbyssWM/Abyssland) | [Hyprland](https://github.com/hyprwm/Hyprland) |
+| [Abyssal](https://github.com/AbyssWM/Abyssal) | [aquamarine](https://github.com/hyprwm/aquamarine) |
+| [Abyssutils](https://github.com/AbyssWM/Abyssutils) | [hyprutils](https://github.com/hyprwm/hyprutils) |
+| [Abyssparse](https://github.com/AbyssWM/Abyssparse) | [hyprlang](https://github.com/hyprwm/hyprlang) |
+| [Abysscursor](https://github.com/AbyssWM/Abysscursor) | [hyprcursor](https://github.com/hyprwm/hyprcursor) |
+| **Abyssgraphics** | [hyprgraphics](https://github.com/hyprwm/hyprgraphics) |
+| [Abysswire](https://github.com/AbyssWM/Abysswire) | [hyprwire](https://github.com/hyprwm/hyprwire) |
+| [Abyss-scanner](https://github.com/AbyssWM/Abyss-scanner) | [hyprwayland-scanner](https://github.com/hyprwm/hyprwayland-scanner) |
+| [Abyssland-protocols](https://github.com/AbyssWM/Abyssland-protocols) | [hyprland-protocols](https://github.com/hyprwm/hyprland-protocols) |
+| [Xdg-desktop-portal-abyss](https://github.com/AbyssWM/Xdg-desktop-portal-abyss) | [xdg-desktop-portal-hyprland](https://github.com/hyprwm/xdg-desktop-portal-hyprland) |
+
+## Credits
+
+Abyssgraphics exists thanks to **[hyprgraphics](https://github.com/hyprwm/hyprgraphics)**, created by **Hypr Development** at **[hyprwm](https://github.com/hyprwm)**. All credit for the original work goes to them – please support the original project.
+
+Abyss is an independent project and is **not affiliated with or endorsed by hyprwm**.
+
+## License
+
+This project is licensed under the **BSD 3-Clause License**. The original copyright notice is kept in [`LICENSE`](LICENSE) as required.
+
+## Contributors
+
+- [bb8TheRobot](https://github.com/bb8TheRobot)
+- Claude (Anthropic) – AI pair programmer

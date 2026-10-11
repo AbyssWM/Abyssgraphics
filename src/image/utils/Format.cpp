@@ -2,10 +2,10 @@
 
 #include <magic.h>
 
-#include <hyprutils/utils/ScopeGuard.hpp>
+#include <abyssutils/utils/ScopeGuard.hpp>
 
-using namespace Hyprgraphics;
-using namespace Hyprutils::Utils;
+using namespace Abyssgraphics;
+using namespace Abyssutils::Utils;
 
 static eImageFormat formatFromStr(const std::string& r) {
     if (r == "image/png")
@@ -66,15 +66,15 @@ static eImageFormat formatOf(const std::string& path) {
     return formatFromStr(r);
 }
 
-eImageFormat Hyprgraphics::formatFromStream(const std::span<const uint8_t>& data) {
+eImageFormat Abyssgraphics::formatFromStream(const std::span<const uint8_t>& data) {
     return formatOf(data);
 }
 
-eImageFormat Hyprgraphics::formatFromFile(const std::string& path) {
+eImageFormat Abyssgraphics::formatFromFile(const std::string& path) {
     return formatOf(path);
 }
 
-const char* Hyprgraphics::mimeOf(eImageFormat f) {
+const char* Abyssgraphics::mimeOf(eImageFormat f) {
     switch (f) {
         case IMAGE_FORMAT_PNG: return "image/png";
         case IMAGE_FORMAT_AVIF: return "image/avif";

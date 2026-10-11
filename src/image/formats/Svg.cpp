@@ -2,12 +2,12 @@
 #include <filesystem>
 #include <fstream>
 #include <librsvg/rsvg.h>
-#include <hyprutils/utils/ScopeGuard.hpp>
-#include <hyprutils/string/String.hpp>
+#include <abyssutils/utils/ScopeGuard.hpp>
+#include <abyssutils/string/String.hpp>
 
-using namespace Hyprutils::Utils;
-using namespace Hyprutils::Math;
-using namespace Hyprutils::String;
+using namespace Abyssutils::Utils;
+using namespace Abyssutils::Math;
+using namespace Abyssutils::String;
 
 static std::optional<std::string> readFileAsString(const std::string& path) {
     std::error_code ec;

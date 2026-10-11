@@ -4,17 +4,17 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
-#include <hyprgraphics/resource/AsyncResourceGatherer.hpp>
-#include <hyprgraphics/resource/resources/TextResource.hpp>
-#include <hyprgraphics/resource/resources/ImageResource.hpp>
-#include <hyprutils/memory/UniquePtr.hpp>
-#include <hyprutils/memory/Atomic.hpp>
-#include <hyprutils/math/Vector2D.hpp>
+#include <abyssgraphics/resource/AsyncResourceGatherer.hpp>
+#include <abyssgraphics/resource/resources/TextResource.hpp>
+#include <abyssgraphics/resource/resources/ImageResource.hpp>
+#include <abyssutils/memory/UniquePtr.hpp>
+#include <abyssutils/memory/Atomic.hpp>
+#include <abyssutils/math/Vector2D.hpp>
 #include "shared.hpp"
 
-using namespace Hyprutils::Memory;
-using namespace Hyprutils::Math;
-using namespace Hyprgraphics;
+using namespace Abyssutils::Memory;
+using namespace Abyssutils::Math;
+using namespace Abyssgraphics;
 
 #define UP CUniquePointer
 
@@ -87,7 +87,7 @@ int main(int argc, char** argv, char** envp) {
     EXPECT(renderText("<b><i>Test markup</i></b>"), true);
     EXPECT(renderText("Test ellipsis!!!!!", {512, 190}),
            true);
-    EXPECT(renderImage("./resource/images/hyprland.png"), true);
+    EXPECT(renderImage("./resource/images/abyssland.png"), true);
 
     while (!state.exit) {
         std::unique_lock lk(state.wakeupMutex);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-namespace Hyprgraphics {
+namespace Abyssgraphics {
     class CColor {
       public:
         // SRGB (NOT linear!!) 0.0 - 1.0

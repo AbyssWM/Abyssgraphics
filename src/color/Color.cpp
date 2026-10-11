@@ -1,8 +1,8 @@
-#include <hyprgraphics/color/Color.hpp>
+#include <abyssgraphics/color/Color.hpp>
 #include <algorithm>
 #include <cmath>
 
-using namespace Hyprgraphics;
+using namespace Abyssgraphics;
 
 static double gammaToLinear(const double in) {
     return in >= 0.04045 ? std::pow((in + 0.055) / 1.055, 2.4) : in / 12.92;
@@ -26,9 +26,9 @@ static double hueToRgb(double p, double q, double t) {
     return p;
 }
 
-Hyprgraphics::CMatrix3::CMatrix3(const std::array<std::array<double, 3>, 3>& values) : m(values) {}
+Abyssgraphics::CMatrix3::CMatrix3(const std::array<std::array<double, 3>, 3>& values) : m(values) {}
 
-CMatrix3 Hyprgraphics::CMatrix3::invert() const {
+CMatrix3 Abyssgraphics::CMatrix3::invert() const {
     double invDet = 1 /
         (0                                                   //
          + m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2]) //
@@ -49,7 +49,7 @@ CMatrix3 Hyprgraphics::CMatrix3::invert() const {
     });
 }
 
-CColor::XYZ Hyprgraphics::CMatrix3::operator*(const CColor::XYZ& value) const {
+CColor::XYZ Abyssgraphics::CMatrix3::operator*(const CColor::XYZ& value) const {
     return CColor::XYZ{
         .x = (m[0][0] * value.x) + (m[0][1] * value.y) + (m[0][2] * value.z), //
         .y = (m[1][0] * value.x) + (m[1][1] * value.y) + (m[1][2] * value.z), //
@@ -57,7 +57,7 @@ CColor::XYZ Hyprgraphics::CMatrix3::operator*(const CColor::XYZ& value) const {
     };
 }
 
-CMatrix3 Hyprgraphics::CMatrix3::operator*(const CMatrix3& other) const {
+CMatrix3 Abyssgraphics::CMatrix3::operator*(const CMatrix3& other) const {
     std::array<std::array<double, 3>, 3> res = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
@@ -69,7 +69,7 @@ CMatrix3 Hyprgraphics::CMatrix3::operator*(const CMatrix3& other) const {
     return CMatrix3(res);
 }
 
-const std::array<std::array<double, 3>, 3>& Hyprgraphics::CMatrix3::mat() {
+const std::array<std::array<double, 3>, 3>& Abyssgraphics::CMatrix3::mat() {
     return m;
 };
 
@@ -88,7 +88,7 @@ const CMatrix3& CMatrix3::identity() {
     return Identity3;
 }
 
-CColor::XYZ Hyprgraphics::xy2xyz(const CColor::xy& xy) {
+CColor::XYZ Abyssgraphics::xy2xyz(const CColor::xy& xy) {
     if (xy.y == 0.0)
         return {.x = 0.0, .y = 0.0, .z = 0.0};
 
@@ -109,7 +109,7 @@ static CMatrix3 Bradford = CMatrix3(std::array<std::array<double, 3>, 3>{
 
 static CMatrix3 BradfordInv = Bradford.invert();
 
-CMatrix3        Hyprgraphics::adaptWhite(const CColor::xy& src, const CColor::xy& dst) {
+CMatrix3        Abyssgraphics::adaptWhite(const CColor::xy& src, const CColor::xy& dst) {
     if (src == dst)
         return CMatrix3::identity();
 
@@ -132,7 +132,7 @@ CMatrix3        Hyprgraphics::adaptWhite(const CColor::xy& src, const CColor::xy
         Bradford;
 }
 
-CMatrix3 Hyprgraphics::SPCPRimaries::toXYZ() const {
+CMatrix3 Abyssgraphics::SPCPRimaries::toXYZ() const {
     const auto r = xy2xyz(red);
     const auto g = xy2xyz(green);
     const auto b = xy2xyz(blue);
@@ -160,19 +160,19 @@ CMatrix3 Hyprgraphics::SPCPRimaries::toXYZ() const {
     };
 }
 
-CMatrix3 Hyprgraphics::SPCPRimaries::convertMatrix(const SPCPRimaries& dst) const {
+CMatrix3 Abyssgraphics::SPCPRimaries::convertMatrix(const SPCPRimaries& dst) const {
     return dst.toXYZ().invert() * adaptWhite(white, dst.white) * toXYZ();
 }
 
-Hyprgraphics::CColor::CColor() {
+Abyssgraphics::CColor::CColor() {
     ;
 }
 
-Hyprgraphics::CColor::CColor(const SSRGB& rgb) : r(rgb.r), g(rgb.g), b(rgb.b) {
+Abyssgraphics::CColor::CColor(const SSRGB& rgb) : r(rgb.r), g(rgb.g), b(rgb.b) {
     ;
 }
 
-Hyprgraphics::CColor::CColor(const SHSL& hsl) {
+Abyssgraphics::CColor::CColor(const SHSL& hsl) {
     if (hsl.s <= 0) {
         r = hsl.l;
         g = hsl.l;
@@ -186,7 +186,7 @@ Hyprgraphics::CColor::CColor(const SHSL& hsl) {
     }
 }
 
-Hyprgraphics::CColor::CColor(const SOkLab& lab) {
+Abyssgraphics::CColor::CColor(const SOkLab& lab) {
     const double l = std::pow(lab.l + (lab.a * 0.3963377774) + (lab.b * 0.2158037573), 3);
     const double m = std::pow(lab.l + (lab.a * (-0.1055613458)) + (lab.b * (-0.0638541728)), 3);
     const double s = std::pow(lab.l + (lab.a * (-0.0894841775)) + (lab.b * (-1.2914855480)), 3);
@@ -196,20 +196,20 @@ Hyprgraphics::CColor::CColor(const SOkLab& lab) {
     b = linearToGamma((l * (-0.0041960863)) + (m * (-0.7034186147)) + (s * 1.7076147010));
 }
 
-Hyprgraphics::CColor::SSRGB Hyprgraphics::CColor::asRgb() const {
-    return Hyprgraphics::CColor::SSRGB{
+Abyssgraphics::CColor::SSRGB Abyssgraphics::CColor::asRgb() const {
+    return Abyssgraphics::CColor::SSRGB{
         .r = r,
         .g = g,
         .b = b,
     };
 }
 
-Hyprgraphics::CColor::SHSL Hyprgraphics::CColor::asHSL() const {
+Abyssgraphics::CColor::SHSL Abyssgraphics::CColor::asHSL() const {
     const double vmax = std::max({r, g, b}), vmin = std::min({r, g, b});
     double       h = 0, s = 0, l = (vmax + vmin) / 2.0;
 
     if (vmax == vmin) {
-        return Hyprgraphics::CColor::SHSL{
+        return Abyssgraphics::CColor::SHSL{
             .h = 0,
             .s = 0,
             .l = l,
@@ -228,14 +228,14 @@ Hyprgraphics::CColor::SHSL Hyprgraphics::CColor::asHSL() const {
 
     h /= 6.0;
 
-    return Hyprgraphics::CColor::SHSL{
+    return Abyssgraphics::CColor::SHSL{
         .h = h,
         .s = s,
         .l = l,
     };
 }
 
-Hyprgraphics::CColor::SOkLab Hyprgraphics::CColor::asOkLab() const {
+Abyssgraphics::CColor::SOkLab Abyssgraphics::CColor::asOkLab() const {
     const double linR = gammaToLinear(r);
     const double linG = gammaToLinear(g);
     const double linB = gammaToLinear(b);
@@ -244,7 +244,7 @@ Hyprgraphics::CColor::SOkLab Hyprgraphics::CColor::asOkLab() const {
     const double m = std::cbrtf((0.2119034982 * linR) + (0.6806995451 * linG) + (0.1073969566 * linB));
     const double s = std::cbrtf((0.0883024619 * linR) + (0.2817188376 * linG) + (0.6299787005 * linB));
 
-    return Hyprgraphics::CColor::SOkLab{
+    return Abyssgraphics::CColor::SOkLab{
         .l = (l * 0.2104542553) + (m * 0.7936177850) + (s * (-0.0040720468)),
         .a = (l * 1.9779984951) + (m * (-2.4285922050)) + (s * 0.4505937099),
         .b = (l * 0.0259040371) + (m * 0.7827717662) + (s * (-0.8086757660)),

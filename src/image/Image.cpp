@@ -1,4 +1,4 @@
-#include <hyprgraphics/image/Image.hpp>
+#include <abyssgraphics/image/Image.hpp>
 #include "utils/Format.hpp"
 #include "formats/Bmp.hpp"
 #include "formats/Jpeg.hpp"
@@ -14,11 +14,11 @@
 #include <magic.h>
 #include <format>
 
-using namespace Hyprgraphics;
-using namespace Hyprutils::Memory;
-using namespace Hyprutils::Math;
+using namespace Abyssgraphics;
+using namespace Abyssutils::Memory;
+using namespace Abyssutils::Math;
 
-Hyprgraphics::CImage::CImage(std::span<const uint8_t> data, eImageFormat format, const Vector2D& size) {
+Abyssgraphics::CImage::CImage(std::span<const uint8_t> data, eImageFormat format, const Vector2D& size) {
 
     const auto FORMAT = format == IMAGE_FORMAT_AUTO ? formatFromStream(data) : format;
 
@@ -34,7 +34,7 @@ Hyprgraphics::CImage::CImage(std::span<const uint8_t> data, eImageFormat format,
 #ifdef HEIF_FOUND
         case IMAGE_FORMAT_AVIF: CAIROSURFACE = AVIF::createSurfaceFromAvif(data); break;
 #else
-        case IMAGE_FORMAT_AVIF: lastError = "hyprgraphics compiled without HEIF support"; return;
+        case IMAGE_FORMAT_AVIF: lastError = "abyssgraphics compiled without HEIF support"; return;
 #endif
         case IMAGE_FORMAT_SVG: CAIROSURFACE = SVG::createSurfaceFromData(data, size); break;
         default: lastError = "Currently only PNG and AVIF images are supported for embedding"; return;
@@ -54,7 +54,7 @@ Hyprgraphics::CImage::CImage(std::span<const uint8_t> data, eImageFormat format,
     pCairoSurface = makeShared<CCairoSurface>(CAIROSURFACE.value());
 }
 
-Hyprgraphics::CImage::CImage(const std::string& path, const Vector2D& size) : filepath(path), m_svgSize(size) {
+Abyssgraphics::CImage::CImage(const std::string& path, const Vector2D& size) : filepath(path), m_svgSize(size) {
 
     const auto FORMAT = formatFromFile(path);
 
@@ -73,12 +73,12 @@ Hyprgraphics::CImage::CImage(const std::string& path, const Vector2D& size) : fi
 #ifdef HEIF_FOUND
         case IMAGE_FORMAT_AVIF: CAIROSURFACE = AVIF::createSurfaceFromAvif(path); break;
 #else
-        case IMAGE_FORMAT_AVIF: lastError = "hyprgraphics compiled without HEIF support"; return;
+        case IMAGE_FORMAT_AVIF: lastError = "abyssgraphics compiled without HEIF support"; return;
 #endif
 #ifdef JXL_FOUND
         case IMAGE_FORMAT_JXL: CAIROSURFACE = JXL::createSurfaceFromJXL(path); break;
 #else
-        case IMAGE_FORMAT_JXL: lastError = "hyprgraphics compiled without JXL support"; return;
+        case IMAGE_FORMAT_JXL: lastError = "abyssgraphics compiled without JXL support"; return;
 #endif
         case IMAGE_FORMAT_JPEG: CAIROSURFACE = JPEG::createSurfaceFromJPEG(path); break;
         case IMAGE_FORMAT_SVG: CAIROSURFACE = SVG::createSurfaceFromSVG(path, size); break;
@@ -100,30 +100,30 @@ Hyprgraphics::CImage::CImage(const std::string& path, const Vector2D& size) : fi
     pCairoSurface = makeShared<CCairoSurface>(CAIROSURFACE.value());
 }
 
-Hyprgraphics::CImage::~CImage() {
+Abyssgraphics::CImage::~CImage() {
     ;
 }
 
-bool Hyprgraphics::CImage::success() {
+bool Abyssgraphics::CImage::success() {
     return loadSuccess;
 }
 
-bool Hyprgraphics::CImage::hasAlpha() {
+bool Abyssgraphics::CImage::hasAlpha() {
     return imageHasAlpha;
 }
 
-std::string Hyprgraphics::CImage::getError() {
+std::string Abyssgraphics::CImage::getError() {
     return lastError;
 }
 
-Hyprutils::Memory::CSharedPointer<CCairoSurface> Hyprgraphics::CImage::cairoSurface() {
+Abyssutils::Memory::CSharedPointer<CCairoSurface> Abyssgraphics::CImage::cairoSurface() {
     return pCairoSurface;
 }
 
-std::string Hyprgraphics::CImage::getMime() {
+std::string Abyssgraphics::CImage::getMime() {
     return mime;
 }
 
-bool Hyprgraphics::CImage::isImageFile(const std::string& path) {
+bool Abyssgraphics::CImage::isImageFile(const std::string& path) {
     return formatFromFile(path) != IMAGE_FORMAT_ERROR;
 }

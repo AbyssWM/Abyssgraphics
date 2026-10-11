@@ -6,8 +6,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <png.h>
-#include <hyprutils/utils/ScopeGuard.hpp>
-using namespace Hyprutils::Utils;
+#include <abyssutils/utils/ScopeGuard.hpp>
+using namespace Abyssutils::Utils;
 
 static std::expected<cairo_surface_t*, std::string> loadPNG(png_structp, png_infop);
 

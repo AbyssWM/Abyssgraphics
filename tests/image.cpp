@@ -4,10 +4,10 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
-#include <hyprgraphics/image/Image.hpp>
+#include <abyssgraphics/image/Image.hpp>
 #include "shared.hpp"
 
-using namespace Hyprgraphics;
+using namespace Abyssgraphics;
 
 static bool tryLoadImageFromFile(const std::string& path) {
     auto image = path.ends_with("svg") ? CImage(path, {512, 512}) : CImage(path);
@@ -77,26 +77,26 @@ int main(int argc, char** argv, char** envp) {
             continue;
         auto expectation = true;
 #ifndef JXL_FOUND
-        if (file.path().filename() == "hyprland.jxl")
+        if (file.path().filename() == "abyssland.jxl")
             expectation = false;
 #endif
 #ifndef HEIF_FOUND
-        if (file.path().filename() == "hyprland.avif")
+        if (file.path().filename() == "abyssland.avif")
             expectation = false;
 #endif
         EXPECT(tryLoadImageFromFile(file.path()), expectation);
     }
 
-    auto pngBuffer = getImageBuffer("./resource/images/hyprland.png");
-    EXPECT(tryLoadImageFromBuffer(pngBuffer, Hyprgraphics::IMAGE_FORMAT_AUTO), true);
+    auto pngBuffer = getImageBuffer("./resource/images/abyssland.png");
+    EXPECT(tryLoadImageFromBuffer(pngBuffer, Abyssgraphics::IMAGE_FORMAT_AUTO), true);
 
 #ifdef HEIF_FOUND
-    auto avifBuffer = getImageBuffer("./resource/images/hyprland.avif");
-    EXPECT(tryLoadImageFromBuffer(avifBuffer, Hyprgraphics::IMAGE_FORMAT_AVIF), true);
+    auto avifBuffer = getImageBuffer("./resource/images/abyssland.avif");
+    EXPECT(tryLoadImageFromBuffer(avifBuffer, Abyssgraphics::IMAGE_FORMAT_AVIF), true);
 #endif
 
-    auto svgBuffer = getImageBuffer("./resource/images/hyprland.svg");
-    EXPECT(tryLoadImageFromBuffer(pngBuffer, Hyprgraphics::IMAGE_FORMAT_AUTO), true);
+    auto svgBuffer = getImageBuffer("./resource/images/abyssland.svg");
+    EXPECT(tryLoadImageFromBuffer(pngBuffer, Abyssgraphics::IMAGE_FORMAT_AUTO), true);
 
     return ret;
 }
