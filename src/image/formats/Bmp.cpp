@@ -58,11 +58,12 @@ class BmpHeader {
         file.read(reinterpret_cast<char*>(&numberOfCollors), sizeof(numberOfCollors));
         file.read(reinterpret_cast<char*>(&numberOfImportantCollors), sizeof(numberOfImportantCollors));
 
-        if (!imageSize)
-            imageSize = sizeOfFile - dataOffset;
+        if (!file || dataOffset >= streamLength)
+            return "Unable to parse bitmap header: truncated file";
 
-        if (imageSize != (width * height * numberOfBitPerPixel / 8))
-            return "Unable to parse bitmap header: wrong image size";
+        // BI_RGB, or BI_BITFIELDS with the usual masks for 32 bit
+        if (compressionMethod != 0 && !(compressionMethod == 3 && numberOfBitPerPixel == 32))
+            return "Unable to parse bitmap header: compressed bitmaps are not supported";
 
         file.seekg(dataOffset);
 
@@ -70,57 +71,72 @@ class BmpHeader {
     };
 };
 
-static void reflectImage(unsigned char* image, uint32_t numberOfRows, int stride) {
-    int                        rowStart = 0;
-    int                        rowEnd   = numberOfRows - 1;
-    std::vector<unsigned char> temp;
-    temp.resize(stride);
-    while (rowStart < rowEnd) {
-        memcpy(&temp[0], &image[static_cast<size_t>(rowStart * stride)], stride);
-        memcpy(&image[static_cast<size_t>(rowStart * stride)], &image[static_cast<size_t>(rowEnd * stride)], stride);
-        memcpy(&image[static_cast<size_t>(rowEnd * stride)], &temp[0], stride);
-        rowStart++;
-        rowEnd--;
-    }
-};
-
-static void convertRgbToArgb(std::ifstream& imageStream, unsigned char* outputImage, uint32_t newImageSize) {
-    uint8_t       forthBitCounter = 0;
-    unsigned long imgCursor       = 0;
-    while (imgCursor < newImageSize) {
-        imageStream.read(reinterpret_cast<char*>(&outputImage[imgCursor]), 1);
-        imgCursor++;
-        forthBitCounter++;
-        if (forthBitCounter == 3) {
-            outputImage[imgCursor] = 0;
-            imgCursor++;
-            forthBitCounter = 0;
-        }
-    }
-};
-
 std::expected<cairo_surface_t*, std::string> BMP::createSurfaceFromBMP(const std::string& path) {
     if (!std::filesystem::exists(path))
         return std::unexpected("loading bmp: file doesn't exist");
 
-    std::ifstream bitmapImageStream(path);
+    std::ifstream bitmapImageStream(path, std::ios::binary);
     BmpHeader     bitmapHeader;
     if (const auto RET = bitmapHeader.load(bitmapImageStream); RET.has_value())
         return std::unexpected("loading bmp: " + *RET);
 
-    cairo_format_t format    = CAIRO_FORMAT_ARGB32;
-    int            stride    = cairo_format_stride_for_width(format, bitmapHeader.width);
-    unsigned char* imageData = (unsigned char*)malloc(static_cast<size_t>(bitmapHeader.height * stride));
-
-    if (bitmapHeader.numberOfBitPerPixel == 24)
-        convertRgbToArgb(bitmapImageStream, imageData, bitmapHeader.height * stride);
-    else if (bitmapHeader.numberOfBitPerPixel == 32)
-        bitmapImageStream.read(reinterpret_cast<char*>(&imageData), bitmapHeader.imageSize);
-    else {
-        bitmapImageStream.close();
+    const auto BPP = bitmapHeader.numberOfBitPerPixel;
+    if (BPP != 24 && BPP != 32)
         return std::unexpected("loading bmp: unsupported bmp stream");
+
+    // a negative height stores the rows top-down
+    const int32_t  WIDTH   = static_cast<int32_t>(bitmapHeader.width);
+    const int32_t  HEIGHT  = static_cast<int32_t>(bitmapHeader.height);
+    const bool     TOPDOWN = HEIGHT < 0;
+    const uint32_t ROWS    = TOPDOWN ? -static_cast<int64_t>(HEIGHT) : HEIGHT;
+    if (WIDTH <= 0 || WIDTH > 32767 || ROWS == 0 || ROWS > 32767)
+        return std::unexpected("loading bmp: invalid image size");
+
+    auto* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, WIDTH, ROWS);
+    if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
+        cairo_surface_destroy(surface);
+        return std::unexpected("loading bmp: failed to create a surface");
     }
-    bitmapImageStream.close();
-    reflectImage(imageData, bitmapHeader.height, stride);
-    return cairo_image_surface_create_for_data(imageData, format, bitmapHeader.width, bitmapHeader.height, stride);
+
+    cairo_surface_flush(surface);
+    unsigned char* data   = cairo_image_surface_get_data(surface);
+    const int      STRIDE = cairo_image_surface_get_stride(surface);
+
+    // rows in the file are padded to 4 bytes
+    const size_t               ROWBYTES = ((static_cast<size_t>(WIDTH) * BPP + 31) / 32) * 4;
+    std::vector<unsigned char> row(ROWBYTES);
+    bool                       anyAlpha = false;
+
+    for (uint32_t r = 0; r < ROWS; ++r) {
+        if (!bitmapImageStream.read(reinterpret_cast<char*>(row.data()), ROWBYTES)) {
+            cairo_surface_destroy(surface);
+            return std::unexpected("loading bmp: file is shorter than the image");
+        }
+
+        auto* dst = reinterpret_cast<uint32_t*>(data + static_cast<size_t>(TOPDOWN ? r : ROWS - 1 - r) * STRIDE);
+        for (int32_t x = 0; x < WIDTH; ++x) {
+            const unsigned char* px = &row[static_cast<size_t>(x) * (BPP / 8)];
+            const uint32_t       A  = BPP == 32 ? px[3] : 0xFF;
+            anyAlpha |= A != 0;
+            // cairo wants premultiplied alpha
+            dst[x] = (A << 24) | ((px[2] * A / 255) << 16) | ((px[1] * A / 255) << 8) | (px[0] * A / 255);
+        }
+    }
+
+    // many 32 bit bitmaps leave the alpha byte at 0: those are opaque
+    if (BPP == 32 && !anyAlpha) {
+        bitmapImageStream.clear();
+        bitmapImageStream.seekg(bitmapHeader.dataOffset);
+        for (uint32_t r = 0; r < ROWS; ++r) {
+            bitmapImageStream.read(reinterpret_cast<char*>(row.data()), ROWBYTES);
+            auto* dst = reinterpret_cast<uint32_t*>(data + static_cast<size_t>(TOPDOWN ? r : ROWS - 1 - r) * STRIDE);
+            for (int32_t x = 0; x < WIDTH; ++x) {
+                const unsigned char* px = &row[static_cast<size_t>(x) * 4];
+                dst[x]                  = 0xFF000000u | (px[2] << 16) | (px[1] << 8) | px[0];
+            }
+        }
+    }
+
+    cairo_surface_mark_dirty(surface);
+    return surface;
 }

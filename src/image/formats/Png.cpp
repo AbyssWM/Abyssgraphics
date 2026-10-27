@@ -80,6 +80,10 @@ static std::expected<cairo_surface_t*, std::string> loadPNG(png_structp png, png
     const auto   COLOR_TYPE = png_get_color_type(png, info);
     const auto   BPP        = png_get_bit_depth(png, info);
 
+    // cairo surfaces end at 32767 pixels per side; checked before W * H * 4 bytes are allocated
+    if (W == 0 || H == 0 || W > 32767 || H > 32767)
+        return std::unexpected("loading png: image too large");
+
     if (BPP == 16)
         png_set_strip_16(png);
     if (COLOR_TYPE == PNG_COLOR_TYPE_PALETTE)
@@ -120,8 +124,11 @@ static std::expected<cairo_surface_t*, std::string> loadPNG(png_structp png, png
 
     auto CAIROSURFACE = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, W, H);
 
-    if (!CAIROSURFACE)
+    // cairo returns an error surface, never null
+    if (cairo_surface_status(CAIROSURFACE) != CAIRO_STATUS_SUCCESS) {
+        cairo_surface_destroy(CAIROSURFACE);
         return std::unexpected("loading png: cairo failed");
+    }
 
     memcpy(cairo_image_surface_get_data(CAIROSURFACE), rawData.data(), rawData.size());
     cairo_surface_mark_dirty(CAIROSURFACE);
