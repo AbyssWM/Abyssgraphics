@@ -30,8 +30,11 @@ void CAsyncResourceGatherer::enqueue(Abyssutils::Memory::CAtomicSharedPointer<IA
 }
 
 void CAsyncResourceGatherer::await(Abyssutils::Memory::CAtomicSharedPointer<IAsyncResource> resource) {
-    resource->m_impl->awaitingCv = Abyssutils::Memory::makeUnique<std::condition_variable>();
+    // under the mutex: a resource rendered before this call must not leave us waiting forever
     std::unique_lock<std::mutex> lk(resource->m_impl->awaitingMtx);
+    if (resource->m_impl->awaitingEvent)
+        return;
+    resource->m_impl->awaitingCv = Abyssutils::Memory::makeUnique<std::condition_variable>();
     resource->m_impl->awaitingCv->wait(lk, [&resource] { return resource->m_impl->awaitingEvent; });
     resource->m_impl->awaitingCv.reset();
 }
@@ -64,9 +67,11 @@ void CAsyncResourceGatherer::asyncAssetSpinLock() {
         for (auto& r : requests) {
             r->render();
 
-            if (r->m_impl->awaitingCv) {
+            {
+                std::lock_guard<std::mutex> lg(r->m_impl->awaitingMtx);
                 r->m_impl->awaitingEvent = true;
-                r->m_impl->awaitingCv->notify_all();
+                if (r->m_impl->awaitingCv)
+                    r->m_impl->awaitingCv->notify_all();
             }
             r->m_ready = true;
             r->m_events.finished.emit();
